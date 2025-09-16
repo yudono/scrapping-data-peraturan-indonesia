@@ -1,0 +1,98 @@
+<html>
+<!--begin::Head-->
+<head>
+    <base href="/30/" />
+    <title>Pencarian Peraturan</title>
+    <meta charset="utf-8" />
+    <meta name="description" content="Pencarian peraturan berdasarkan kata kunci, nama entitas, tahun, jenis dan tema peraturan " />
+    <meta name="keywords" content="pencarian" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta property="og:locale" content="id_ID" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Pencarian Peraturan" />
+    <meta property="og:url" content="http://peraturan.bpk.go.id/Search?tahun=2025&amp;page=1" />
+    <meta property="og:site_name" content="Database Peraturan | JDIH BPK" />
+
+    <link rel="shortcut icon" href="assets/media/logos/bpk-ico.ico" />
+    <!--begin::Fonts(mandatory for all pages)-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" />
+    <!--end::Fonts-->
+
+    <!--begin::Vendor Stylesheets(used for this page only)-->
+    <link href="assets/plugins/custom/datatables/datatables.bundle.css" rel="stylesheet" type="text/css" />
+    <!--end::Vendor Stylesheets-->
+
+    <!--begin::Global Stylesheets Bundle(mandatory for all pages)-->
+    <link href="assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
+    <link href="assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
+    <link href="../lib/jsSocials/jssocials.min.css" rel="stylesheet" type="text/css" />
+    <link href="../lib/jsSocials/jssocials-theme-flat.min.css" rel="stylesheet" type="text/css" />
+    <!--end::Global Stylesheets Bundle-->
+    
+    <style>
+        .pdf-container {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            padding-top: 125%; /* 16:9 Aspect Ratio (divide 9 by 16 = 0.5625) */
+        }
+
+            .pdf-container iframe {
+                position: absolute;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                right: 0;
+                width: 100%;
+                height: 100%;
+                border: none;
+            }
+    </style>
+
+    <script src="/lib/alpinejs/cdn.min.js" defer></script>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YTJBMZPE44"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-YTJBMZPE44');
+    </script>
+</head>
+<!--end::Head-->
+
+<!--begin::Body-->
+
+<body>
+    <div class="d-flex flex-column flex-root app-root">
+        <div class="flex-column flex-column-fluid app-page">
+            <div class="app-header" data-kt-sticky="true" data-kt-sticky-activate="{default: false, lg: true}"
+                data-kt-sticky-name="app-header-sticky" data-kt-sticky-offset="{default: false, lg: '300px'}">
+                <!--begin::Header container-->
+                <div class="app-container container-xxl d-flex align-items-stretch justify-content-between"
+                    id="kt_app_header_container">
+                    <!--begin::Header mobile toggle-->
+                    <div class="d-flex align-items-center d-lg-none ms-n2 me-2" title="Show sidebar menu">
+                        <div class="btn btn-icon btn-active-color-primary w-35px h-35px" id="kt_app_header_menu_toggle">
+                            <!--begin::Svg Icon | path: icons/duotune/abstract/abs015.svg-->
+                            <span class="svg-icon svg-icon-2">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M21 7H3C2.4 7 2 6.6 2 6V4C2 3.4 2.4 3 3 3H21C21.6 3 22 3.4 22 4V6C22 6.6 21.6 7 21 7Z"
+                                        fill="currentColor" />
+                                    <path opacity="0.3"
+                                        d="M21 14H3C2.4 14 2 13.6 2 13V11C2 10.4 2.4 10 3 10H21C21.6 10 22 10.4 22 11V13C22 13.6 21.6 14 21 14ZM22 20V18C22 17.4 21.6 17 21 17H3C2.4 17 2 17.4 2 18V20C2 20.6 2.4 21 3 21H21C21.6 21 22 20.6 22 20Z"
+                                        fill="currentColor" />
+                                </svg>
+                            </span>
+                            <!--end::Svg Icon-->
+                        </div>
+                    </div>
+                    <!--end::Header mobile toggle-->
+                    <!--begin::Logo-->
+                    <div class="d-flex align-items-center flex-grow-1 flex-lg-grow-0 me-lg-15">
+                        <a href="/">
+                            <img alt="Logo" src="assets/media/logos/logo.png"
+                                class="h-45px d-none d-sm-inline app-si
