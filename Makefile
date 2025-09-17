@@ -19,6 +19,7 @@ help:
 	@echo "  make list-year  - List files for specific year (use YEAR=xxxx)"
 	@echo "  make cleanup    - Remove empty directories"
 	@echo "  make export     - Export metadata to CSV"
+	@echo "  make extract-pdf - Extract all PDF files to text format"
 	@echo "  make clean      - Clean all downloaded files and logs"
 	@echo "  make config     - Show current configuration"
 	@echo ""
@@ -96,6 +97,11 @@ clean:
 	rm -f scraper.log
 	rm -f metadata.csv
 	@echo "Cleanup completed!"
+
+# PDF extraction commands
+extract-pdf:
+	@echo "Extracting PDF files to text format..."
+	python extract_pdf_to_text.py
 
 # Quick start commands
 quick-test: install test
