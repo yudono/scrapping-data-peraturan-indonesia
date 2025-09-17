@@ -84,6 +84,7 @@ make list           # List semua file berdasarkan tahun
 make list-year      # List file untuk tahun tertentu (YEAR=xxxx)
 make cleanup        # Hapus direktori kosong
 make export         # Export metadata ke CSV
+make extract-pdf    # Ekstrak semua PDF ke format teks
 make clean          # Hapus semua file download dan log
 ```
 
@@ -107,6 +108,69 @@ downloads/
 │   └── ...
 └── 2025/                 # Folder untuk tahun 2025
     └── ...
+```
+
+## Ekstraksi PDF ke Teks
+
+Setelah mendownload file PDF, Anda dapat mengekstrak konten teks untuk analisis lebih lanjut:
+
+### Menggunakan Makefile (Recommended)
+
+```bash
+# Ekstrak semua PDF ke format teks
+make extract-pdf
+```
+
+### Menjalankan Script Manual
+
+```bash
+# Install dependency tambahan (jika belum)
+pip install "PyPDF2>=3.0.0"
+
+# Jalankan ekstraksi
+python extract_pdf_to_text.py
+```
+
+### Output Ekstraksi
+
+Script akan membuat:
+
+1. **Folder `dataset_txt/`**: Berisi file teks individual untuk setiap PDF
+   ```
+   dataset_txt/
+   ├── 1945/
+   │   ├── peraturan1.txt
+   │   └── peraturan2.txt
+   ├── 1946/
+   │   └── ...
+   └── 2025/
+       └── ...
+   ```
+
+2. **File `dataset_law.txt`**: Dataset gabungan semua teks peraturan
+   - Format: Setiap peraturan dipisahkan dengan header nama file
+   - Encoding: UTF-8
+   - Siap untuk analisis teks, machine learning, atau penelitian
+
+### Fitur Ekstraksi
+
+- ✅ **Batch Processing**: Ekstrak semua PDF sekaligus
+- ✅ **Error Handling**: Skip file yang corrupt/tidak bisa dibaca
+- ✅ **Progress Tracking**: Menampilkan progress ekstraksi
+- ✅ **Struktur Folder**: Mempertahankan struktur folder asli
+- ✅ **Dataset Gabungan**: Otomatis menggabungkan semua teks
+- ✅ **UTF-8 Encoding**: Mendukung karakter Indonesia dengan baik
+
+### Contoh Penggunaan Dataset
+
+```python
+# Baca dataset gabungan
+with open('dataset_law.txt', 'r', encoding='utf-8') as f:
+    all_laws = f.read()
+
+# Analisis teks, word frequency, dll
+print(f"Total karakter: {len(all_laws)}")
+print(f"Total kata: {len(all_laws.split())}")
 ```
 
 ## Konfigurasi
