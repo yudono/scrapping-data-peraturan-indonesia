@@ -81,7 +81,7 @@ class PeraturanScraper:
         try:
             params = {
                 'tahun': tahun,
-                'page': page
+                'p': page  # Website menggunakan 'p' untuk pagination, bukan 'page'
             }
             
             # Setup request parameters
@@ -161,15 +161,29 @@ class PeraturanScraper:
         if not pagination:
             return 1
         
-        # Cari nomor halaman terakhir
+        # Cari link "Last" atau "Terakhir" yang menunjukkan halaman terakhir
         page_links = pagination.find_all('a', href=True)
         max_page = 1
         
         for link in page_links:
-            text = link.get_text(strip=True)
-            if text.isdigit():
+            text = link.get_text(strip=True).lower()
+            href = link.get('href', '')
+            
+            # Cek link "Last" atau "Terakhir"
+            if text in ['last', 'terakhir', '»', '>>']:
+                # Extract nomor halaman dari URL
+                import re
+                page_match = re.search(r'[?&]p=(\d+)', href)
+                if page_match:
+                    last_page = int(page_match.group(1))
+                    max_page = max(max_page, last_page)
+                    logger.info(f"Ditemukan link 'Last' ke halaman {last_page}")
+            
+            # Tetap cek nomor halaman yang terlihat sebagai fallback
+            elif text.isdigit():
                 max_page = max(max_page, int(text))
         
+        logger.info(f"Total halaman yang terdeteksi: {max_page}")
         return max_page
     
     def download_file(self, url, filename, max_retries=None):
