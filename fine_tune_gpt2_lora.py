@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
 """
 Fine-tune GPT-2 on Indonesian legal text using LoRA (parameter-efficient and lightweight).
-By default, it trains only on dataset_txt/1945/* to keep it light for testing.
+By default, it trains on dataset_law.txt to keep it light for testing.
 
 Usage examples:
   # Install dependencies first
   # pip install -r requirements.txt
 
-  # Quick test on 1945 dataset with tiny settings
+  # Quick test on dataset_law.txt with tiny settings
   # python fine_tune_gpt2_lora.py \
-  #   --dataset_dir dataset_txt/1945 \
-  #   --output_dir outputs/gpt2-lora-1945 \
+  #   --dataset_path dataset_law.txt \
+  #   --output_dir outputs/gpt2-lora-law \
   #   --block_size 256 --batch_size 1 --grad_accum 8 \
   #   --epochs 1 --max_train_steps 200 --save_steps 200
 
   # Resume training later (if needed)
-  # python fine_tune_gpt2_lora.py --dataset_dir dataset_txt/1945 --output_dir outputs/gpt2-lora-1945 --resume_from_checkpoint yes
+  # python fine_tune_gpt2_lora.py --dataset_path dataset_law.txt --output_dir outputs/gpt2-lora-law --resume_from_checkpoint yes
 
 This script saves LoRA adapter weights (PEFT) to output_dir.
 """
@@ -45,27 +45,40 @@ except Exception:
 
 
 class TextChunkDataset(Dataset):
-    """Simple dataset that reads all .txt files under dataset_dir,
+    """Simple dataset that reads all .txt files under dataset_dir or a single file,
     concatenates them with separators, tokenizes once, and returns fixed-size chunks."""
 
-    def __init__(self, tokenizer, dataset_dir, block_size=256, limit_chars=None):
+    def __init__(self, tokenizer, dataset_path, block_size=256, limit_chars=None):
         self.tokenizer = tokenizer
         self.block_size = block_size
 
-        # Read all .txt files under dataset_dir
-        files = sorted(glob(os.path.join(dataset_dir, "*.txt")))
         texts = []
         sep = "\n\n<|sep|>\n\n"
-        for fp in files:
+        
+        # Check if dataset_path is a single file or directory
+        if os.path.isfile(dataset_path):
+            # Single file mode
             try:
-                with open(fp, "r", encoding="utf-8", errors="ignore") as f:
+                with open(dataset_path, "r", encoding="utf-8", errors="ignore") as f:
                     txt = f.read()
                     if txt:
                         texts.append(txt.strip())
             except Exception as e:
-                print(f"[WARN] Gagal membaca: {fp} -> {e}")
+                print(f"[WARN] Gagal membaca: {dataset_path} -> {e}")
+        else:
+            # Directory mode - read all .txt files under dataset_path
+            files = sorted(glob(os.path.join(dataset_path, "*.txt")))
+            for fp in files:
+                try:
+                    with open(fp, "r", encoding="utf-8", errors="ignore") as f:
+                        txt = f.read()
+                        if txt:
+                            texts.append(txt.strip())
+                except Exception as e:
+                    print(f"[WARN] Gagal membaca: {fp} -> {e}")
+        
         if not texts:
-            raise RuntimeError(f"Tidak ada file .txt di {dataset_dir}")
+            raise RuntimeError(f"Tidak ada teks yang dapat dibaca dari {dataset_path}")
 
         corpus = sep.join(texts)
         if limit_chars is not None:
@@ -97,8 +110,8 @@ class TextChunkDataset(Dataset):
         return {"input_ids": x, "labels": x.clone()}
 
 
-def build_datasets(tokenizer, dataset_dir, block_size, val_ratio=0.1, seed=42, limit_chars=None):
-    full_ds = TextChunkDataset(tokenizer, dataset_dir, block_size=block_size, limit_chars=limit_chars)
+def build_datasets(tokenizer, dataset_path, block_size, val_ratio=0.1, seed=42, limit_chars=None):
+    full_ds = TextChunkDataset(tokenizer, dataset_path, block_size=block_size, limit_chars=limit_chars)
     val_len = max(1, int(len(full_ds) * val_ratio))
     train_len = len(full_ds) - val_len
     set_seed(seed)
@@ -191,7 +204,7 @@ def train(args):
     # Build datasets
     train_ds, val_ds = build_datasets(
         tokenizer,
-        args.dataset_dir,
+        args.dataset_path,
         block_size=args.block_size,
         val_ratio=args.val_ratio,
         seed=args.seed,
@@ -216,6 +229,9 @@ def train(args):
     save_total_limit = max(1, args.save_total_limit)
     fp16 = args.fp16 and torch.cuda.is_available()
 
+    # Handle max_steps properly
+    max_steps = args.max_train_steps if args.max_train_steps > 0 else -1
+    
     training_args = TrainingArguments(
         output_dir=args.output_dir,
         overwrite_output_dir=True,
@@ -236,7 +252,7 @@ def train(args):
         lr_scheduler_type=args.lr_scheduler,
         fp16=fp16,
         bf16=args.bf16,
-        max_steps=args.max_train_steps if args.max_train_steps > 0 else None,
+        max_steps=max_steps,
         report_to=[],  # disable wandb by default
         dataloader_pin_memory=False,
         gradient_checkpointing=True,
@@ -288,8 +304,8 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Fine-tune GPT-2 with LoRA on Indonesian legal text")
 
     # Data & paths
-    parser.add_argument("--dataset_dir", type=str, default="dataset_txt/1945", help="Path folder berisi file .txt")
-    parser.add_argument("--output_dir", type=str, default="outputs/gpt2-lora-1945", help="Folder output model/adaptor")
+    parser.add_argument("--dataset_path", type=str, default="dataset_law.txt", help="Path ke file .txt atau folder berisi file .txt")
+    parser.add_argument("--output_dir", type=str, default="outputs/gpt2-lora-law", help="Folder output model/adaptor")
 
     # Model
     parser.add_argument("--model_name", type=str, default="gpt2", help="Nama model HF (mis. gpt2, gpt2-medium)")
