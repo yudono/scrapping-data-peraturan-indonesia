@@ -2,3 +2,7 @@ requests>=2.28.0
 beautifulsoup4>=4.11.0
 lxml>=4.9.0
 PyPDF2>=3.0.0
+# For fine-tuning GPT-2 with LoRA
+torch>=2.2.0
+transformers>=4.42.0
+peft>=0.11.1

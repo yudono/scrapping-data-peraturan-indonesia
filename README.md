@@ -300,3 +300,15 @@ Silakan buat issue atau pull request untuk perbaikan dan penambahan fitur.
 ## Disclaimer
 
 Script ini dibuat untuk tujuan penelitian dan edukasi. Pastikan untuk mematuhi terms of service website BPK dan menggunakan data yang diunduh sesuai dengan ketentuan yang berlaku.
+
+ini command untuk training:
+bash -lc 'python fine_tune_gpt2_lora.py --dataset_dir dataset_txt/1945 --output_dir outputs/hukum_1945 --model_name distilgpt2 --epochs 1 --max_train_steps 150 --batch_size 1 --grad_accum 8 --block_size 128 --eval_steps 50 --save_steps 50 --logging_steps 10 --save_total_limit 2 --sample_after_train --sample_prompt "Undang-undang"'
+
+python fine_tune_gpt2_lora.py --dataset_dir dataset_txt/1945 --output_dir outputs/hukum_1945_rerun --model_name distilgpt2 --epochs 1 --max_train_steps 30 --batch_size 1 --grad_accum 8 --block_size 128 --eval_steps 15 --save_steps 1000 --logging_steps 5 --save_total_limit 2 --sample_after_train --sample_prompt "Undang-undang" 
+
+python fine_tune_gpt2_lora.py --dataset_dir dataset_txt/1945 --output_dir outputs/hukum_1945_gpt2 --model_name gpt2 --epochs 1 --max_train_steps 180 --batch_size 1 --grad_accum 8 --block_size 256 --eval_steps 30 --save_steps 60 --logging_steps 10 --save_total_limit 3 --sample_after_train --sample_prompt "Undang-undang tentang peraturan perpajakan" 
+
+ini buat runing:
+bash -lc 'python run_hukum_1945.py --prompt "Undang-undang tentang peraturan perpajakan" --adapter_dir outputs/hukum_1945 --base_model distilgpt2 --max_new_tokens 80 --top_p 0.95 --temperature 0.8' 
+
+bash -lc 'python run_hukum_1945.py --prompt "Undang-undang tentang peraturan perpajakan" --adapter_dir outputs/hukum_1945_rerun --base_model distilgpt2 --max_new_tokens 80 --top_p 0.95 --temperature 0.8' 
